@@ -7,16 +7,21 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Giphy API</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <link rel="stylesheet" href="./styles/styles.css">
+    <link rel="stylesheet" href="./assets/styles/styles.css">
 </head>
 
 <body>
-    <header>
-        <nav></nav>
-    </header>
-
     <main>
-        <p class="p-tag">This is our index file</p>
+        <div id="giphyButtons"></div>
+
+        <form id="motivationForm">
+            <label for="motivationInput">Get More Motivation</label>
+            <input type="text" id="motivationInput"><br>
+            <input id="moreMotivation" type="submit" value="Get More Motivation">
+        </form>
+
+        <div id="giphys"></div>
+
     </main>
     <footer></footer>
 
