@@ -7,31 +7,42 @@ const motivation = ['Inspiration', 'Happiness', 'Strength', 'Motivate', 'Inspire
 // const URL = 'https://api.giphy.com/v1/gifs/search?';
 // const apiKey = '&api_key=sd0BFqPzqnPbrf9aXtsAg1gqTitD94RA';
 // const query = `"&q="${motivate}`;
-
-function onHover() {
-
-}
-
-function displayRating(event) {
-  const motivate = $(event.target).data('name');
-  // const motivate = $(this).attr('data-name');
-  const queryURL = `https://api.giphy.com/v1/gifs/search?&q=${motivate}&api_key=sd0BFqPzqnPbrf9aXtsAg1gqTitD94RA&limit=10`;
-  // console.log(motivate);
-  $.ajax({
-    url: queryURL,
-    method: 'GET',
-  }).then(function(response) {
-    // const motivationRatingDiv = $("<div class='rating'>");
-    for (let i = 0; i < motivation.length; i++) {
-      const giphyRating = $(`<p style="font-size: 20px;">Rating: ${response.data[i].rating}</p>`);
-      const giphyImages = $('<img>');
-      giphyImages.attr('src', response.data[i].images.fixed_height_still.url);
-      giphyImages.attr('data-still', response.data[i].images.fixed_height_still.url);
-      giphyImages.attr('data-animate', response.data[i].images.fixed_height.url);
-      giphyImages.attr('data-state', 'still');
-      giphyImages.addClass('image');
-      $('#giphy').append(giphyRating, giphyImages);
-    }
+$(function () {
+  function displayRating(event) {
+    let motivate = $(event.target).data('name');
+    // const motivate = $(this).attr('data-name');
+    let queryURL = `https://api.giphy.com/v1/gifs/search?&q=${motivate}&api_key=sd0BFqPzqnPbrf9aXtsAg1gqTitD94RA&limit=10`;
+    // console.log(motivate);
+    $.ajax({
+      url: queryURL,
+      method: 'GET',
+    }).then(function(response) {
+      console.log(response.data);
+      // const motivationRatingDiv = $("<div class='rating'>");
+      for (let i = 0; i < response.data.length; i++) {
+        // let motivationGiphyDiv = $("<div class='motivation'>");
+        // let giphyRating = $(`<p>Rating: ${response.data[i].rating}</p>`);
+        // let giphyImages = $('<img>');
+        // giphyImages.attr('src', response.data[i].images.fixed_height_still.url);
+        // giphyImages.attr('data-still', response.data[i].images.fixed_height_still.url);
+        // giphyImages.attr('data-animate', response.data[i].images.fixed_height.url);
+        // giphyImages.attr('data-state', 'still');
+        // giphyImages.addClass('image');
+        // $('.motivation').append(giphyRating, giphyImages);
+        
+        let giphyBox = `
+        <div class='motivation'>
+          <p> Rating: ${response.data[i].rating}</p>
+          <img src=${response.data[i].images.fixed_height_still.url}
+            data-still=${response.data[i].images.fixed_height_still.url}
+            data-animate=${response.data[i].images.fixed_height.url}
+            data-state='still'
+            class='image'
+          />
+        </div>
+        `
+        $('#giphy').append(giphyBox);
+      }
 
     // const ratings = response.data[i].rating;
     // const pOne = $('<p>').text(`Rating: ${ratings}`);
@@ -51,54 +62,66 @@ function displayRating(event) {
 
     // src="${response.data[i].images.fixed_height_still.url},
     // }
+    });
+  }
+
+
+  $(document).on('mouseenter', '.image', function() {
+    const imageState = $(this).attr('data-state');
+    if (imageState == 'still') {
+      $(this).attr('src', $(this).data('animate'));
+      $(this).attr('data-state', 'animate');
+    } else {
+      $(this).attr('src', $(this).data('still'));
+      $(this).attr('data-state', 'still');
+    }
   });
-}
 
+  $(document).on('mouseleave', '.image', function() {
+    const imageState = $(this).attr('data-state');
+    if (imageState == 'animate') {
+      $(this).attr('src', $(this).data('still'));
+      $(this).attr('data-state', 'still');
+    } else {
+      $(this).attr('src', $(this).data('animate'));
+      $(this).attr('data-state', 'animate');
+    }
+  });
 
-$(document).on('click', '.image', function() {
-  const imageState = $(this).attr('data-state');
-  if (imageState == 'still') {
-    $(this).attr('src', $(this).data('animate'));
-    $(this).attr('data-state', 'animate');
-  } else {
-    $(this).attr('src', $(this).data('still'));
-    $(this).attr('data-state', 'still');
+  function renderButtons() {
+    $('#giphyButtons').empty();
+    for (let i = 0; i < motivation.length; i++) {
+      const a = $('<button>');
+      a.addClass('motivate-btn');
+      a.attr('data-name', motivation[i]);
+      a.text(motivation[i]);
+      $('#giphyButtons').append(a);
+    }
   }
-});
 
-function renderButtons() {
-  $('#giphyButtons').empty();
-  for (let i = 0; i < motivation.length; i++) {
-    const a = $('<button>');
-    a.addClass('motivate-btn');
-    a.attr('data-name', motivation[i]);
-    a.text(motivation[i]);
-    $('#giphyButtons').append(a);
-  }
-}
+  $('#moreMotivation').on('click', function(event) {
+    event.preventDefault();
+    const motivate = $('#motivationInput').val().trim();
+    motivation.push(motivate);
+    $('#motivationInput').val('');
 
-$('#moreMotivation').on('click', function(event) {
-  event.preventDefault();
-  const motivate = $('#motivationInput').val().trim();
-  motivation.push(motivate);
-  $('#motivationInput').val('');
+    renderButtons();
+  });
+
+  $('#giphyButtons').on('click', function(event) {
+    event.preventDefault();
+    $('#giphy').empty();
+  });
+
+  $('#stopGiphy').on('click', function(event) {
+    event.preventDefault();
+    $('#giphy').empty();
+  });
+
+  $(document).on('click', '.motivate-btn', displayRating);
 
   renderButtons();
 });
-
-$('#giphyButtons').on('click', function(event) {
-  event.preventDefault();
-  $('#giphy').empty();
-});
-
-$('#stopGiphy').on('click', function(event) {
-  event.preventDefault();
-  $('#giphy').empty();
-});
-
-$(document).on('click', '.motivate-btn', displayRating);
-
-renderButtons();
 
 // const motivationDiv = $("<div class='motivate'>");
 // for (let j = 0; j < motivation.length; j++) {
